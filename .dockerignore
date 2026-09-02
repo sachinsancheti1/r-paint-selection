@@ -1,0 +1,7 @@
+.git/
+.Rproj.user/
+.RData
+.Rhistory
+desktop.ini
+*.Rproj
+*.xlsx
