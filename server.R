@@ -25,7 +25,30 @@ hex_to_rgb <- function(hex) {
 rgb_to_hex <- function(r, g, b) sprintf("#%02X%02X%02X", r, g, b)
 
 swatch_html <- function(hex) {
-  sprintf('<div style="width:28px;height:20px;background:%s;border:1px solid #999;border-radius:3px;"></div>', hex)
+  sprintf('<div style="width:56px;height:36px;background:%s;border:1px solid #999;border-radius:3px;"></div>', hex)
+}
+
+# Large preview shown for the most recently selected table row - a 56x36
+# table swatch is too small to actually judge a color by (the whole point
+# of this app); this gives a real, sizable block plus the details needed
+# to go order it.
+large_preview_ui <- function(row) {
+  if (is.null(row) || nrow(row) == 0) {
+    return(tags$p(tags$small("Select a row to preview it here.")))
+  }
+  tagList(
+    tags$div(style = sprintf(
+      "width:100%%; height:120px; background:%s; border:1px solid #999; border-radius:6px; margin-bottom:8px;",
+      row$Hex
+    )),
+    tags$table(
+      style = "font-size: 14px;",
+      tags$tr(tags$td(tags$b("Brand: ")), tags$td(row$Brand)),
+      tags$tr(tags$td(tags$b("Code: ")), tags$td(row$Code)),
+      tags$tr(tags$td(tags$b("Name: ")), tags$td(row$Name)),
+      tags$tr(tags$td(tags$b("Hex: ")), tags$td(row$Hex))
+    )
+  )
 }
 
 match_catalog <- function(target_rgb, catalog, top_n) {
@@ -81,6 +104,16 @@ shinyServer(function(input, output, session) {
                   options = list(pageLength = 20))
   })
 
+  # Preview follows the most recently clicked row, not just the first
+  # selected - clicking a new row to compare should update the preview
+  # immediately even with earlier rows still checked.
+  output$match_preview <- renderUI({
+    sel <- input$matches_table_rows_selected
+    if (length(sel) == 0) return(large_preview_ui(NULL))
+    m <- matches()[tail(sel, 1)]
+    large_preview_ui(data.table(Brand = m$brand, Code = m$code, Name = m$name, Hex = m$hex))
+  })
+
   palette <- reactiveVal(data.table(
     Label = character(), Target = character(), Brand = character(), Code = character(),
     Name = character(), Hex = character(), DeltaE = numeric()
@@ -104,6 +137,13 @@ shinyServer(function(input, output, session) {
     setcolorder(df, intersect(c("Swatch", names(p)), names(df)))
     DT::datatable(df, selection = "multiple", rownames = FALSE, escape = FALSE,
                   options = list(pageLength = 20))
+  })
+
+  output$palette_preview <- renderUI({
+    sel <- input$palette_table_rows_selected
+    if (length(sel) == 0) return(large_preview_ui(NULL))
+    p <- palette()[tail(sel, 1)]
+    large_preview_ui(data.table(Brand = p$Brand, Code = p$Code, Name = p$Name, Hex = p$Hex))
   })
 
   observeEvent(input$remove_selected, {

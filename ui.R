@@ -104,14 +104,20 @@ shinyUI(fluidPage(
           tags$p(tags$small("Select rows below, then add them to your palette.")),
           actionButton("add_selected", "Add selected to palette", class = "btn-success"),
           tags$hr(),
-          DT::dataTableOutput("matches_table")
+          fluidRow(
+            column(9, DT::dataTableOutput("matches_table")),
+            column(3, h5("Preview"), uiOutput("match_preview"))
+          )
         ),
         tabPanel(
           "Palette",
           tags$p(tags$small("Select rows below to remove them from the palette.")),
           actionButton("remove_selected", "Remove selected"),
           tags$hr(),
-          DT::dataTableOutput("palette_table")
+          fluidRow(
+            column(9, DT::dataTableOutput("palette_table")),
+            column(3, h5("Preview"), uiOutput("palette_preview"))
+          )
         )
       )
     )
