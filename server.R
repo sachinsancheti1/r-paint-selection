@@ -4,6 +4,13 @@ library(data.table)
 library(farver)
 library(DT)
 
+# Default Shiny upload cap is 5MB. Matches nginx's client_max_body_size
+# (200M) in nginx.conf.template - nginx's own default (1MB) sits in front
+# of this and would 413 anything larger before Shiny ever saw it, so both
+# had to move together. This app has no real file upload today, but kept
+# consistent with the other apps rather than a silent exception.
+options(shiny.maxRequestSize = 200 * 1024^2)
+
 # colClasses forced explicitly: Asian Paints has no genuine descriptive
 # shade name (see README), so its "name" column is entirely blank -
 # fread infers an all-blank column as logical rather than character,
