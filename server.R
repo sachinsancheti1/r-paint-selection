@@ -12,7 +12,8 @@ library(DT)
 catalog_colclasses <- c(code = "character", name = "character")
 catalogs <- list(
   Berger = fread("catalog_berger.csv", colClasses = catalog_colclasses),
-  "Asian Paints" = fread("catalog_asian.csv", colClasses = catalog_colclasses)
+  "Asian Paints" = fread("catalog_asian.csv", colClasses = catalog_colclasses),
+  "Birla Opus" = fread("catalog_birla_opus.csv", colClasses = catalog_colclasses)
 )
 
 hex_to_rgb <- function(hex) {
