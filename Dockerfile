@@ -21,8 +21,11 @@ RUN Rscript -e "pkgs <- c('shiny','data.table','farver','DT'); missing <- pkgs[!
 WORKDIR /app
 COPY ui.R /app/ui.R
 COPY server.R /app/server.R
-COPY catalog_berger.csv /app/catalog_berger.csv
-COPY catalog_asian.csv /app/catalog_asian.csv
+# Wildcarded rather than one COPY per file - a new catalog_*.csv (a future
+# brand) landed in server.R's fread() calls without a matching COPY line
+# here once already, which only surfaced as a live 500/crash-on-first-
+# search after deploy, not at build time.
+COPY catalog_*.csv /app/
 
 RUN mkdir -p /etc/nginx/templates
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
