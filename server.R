@@ -4,9 +4,15 @@ library(data.table)
 library(farver)
 library(DT)
 
+# colClasses forced explicitly: Asian Paints has no genuine descriptive
+# shade name (see README), so its "name" column is entirely blank -
+# fread infers an all-blank column as logical rather than character,
+# which would silently break rbindlist() below when combined with
+# Berger's character-type names.
+catalog_colclasses <- c(code = "character", name = "character")
 catalogs <- list(
-  Berger = fread("catalog_berger.csv"),
-  "Asian Paints" = fread("catalog_asian.csv")
+  Berger = fread("catalog_berger.csv", colClasses = catalog_colclasses),
+  "Asian Paints" = fread("catalog_asian.csv", colClasses = catalog_colclasses)
 )
 
 hex_to_rgb <- function(hex) {
